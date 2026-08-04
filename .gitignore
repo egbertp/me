@@ -24,3 +24,6 @@ personal_website-*.tar
 
 /output/
 /arch/
+
+# Don't commit the private part of the deploy key
+id_ed25519_deploy

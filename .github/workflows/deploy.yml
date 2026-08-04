@@ -1,4 +1,4 @@
-name: Build and deploy to Cloudflare Pages
+name: Build and deploy
 
 on:
   push:
@@ -6,8 +6,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: ${{ github.ref }}
@@ -15,9 +13,6 @@ concurrency:
 
 jobs:
   build_and_deploy:
-    # environment:
-    #   name: cloudflare
-    #   url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -34,12 +29,14 @@ jobs:
         run: mix format --check-formatted
       - name: Run credo
         run: mix credo
-      # - name: Publish to Cloudflare Pages
-      #   uses: cloudflare/pages-action@v1
+      # - name: Install SSH key
+      #   uses: webfactory/ssh-agent@v0.9.0
       #   with:
-      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      #     accountId: 0b852855aa7a6d1fe0f8efd73cc966ba
-      #     projectName: jorin
-      #     directory: output
-      #     branch: main
-      #     wranglerVersion: "3"
+      #     ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+      - name: Deploy to VM
+        run: |
+          rsync -avz --delete output/ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:."
