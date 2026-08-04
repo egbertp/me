@@ -1,0 +1,45 @@
+name: Build and deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_deploy:
+    # environment:
+    #   name: cloudflare
+    #   url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.19" # Define the elixir version [required]
+          otp-version: "29" # Define the OTP version [required]
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Compile
+        run: mix compile --warnings-as-errors --all-warnings
+      - name: Check format
+        run: mix format --check-formatted
+      - name: Run credo
+        run: mix credo
+      # - name: Publish to Cloudflare Pages
+      #   uses: cloudflare/pages-action@v1
+      #   with:
+      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     accountId: 0b852855aa7a6d1fe0f8efd73cc966ba
+      #     projectName: jorin
+      #     directory: output
+      #     branch: main
+      #     wranglerVersion: "3"
