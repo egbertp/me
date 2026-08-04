@@ -13,7 +13,7 @@ I've added the `SSH public key` to the repository; see `id_ed25519_deploy.pub`
 Get the values for `SSH_KNOWN_HOSTS` with this command: 
 
 ```shell
-$ ssh-keyscan spider.knutsel.space
+$ ssh-keyscan your-vm-host.com
 ```
 
 Copy all the lines to the `SSH_KNOWN_HOSTS` variable
@@ -79,18 +79,18 @@ Test before wiring it into CI (use the deploy private key you generated earlier)
 ```shell
 rsync -avzn --delete -e "ssh -i deploy_key" output/ deploy@your-vm-host:/var/www/htdocs/egbertpot.nl
 ```
-Since the `authorized_keys` file alreayd holds the `/var/www/htdocs/egbertpot.nl` path, you should not specify the full path again. That is why the destination should look like `deploy@spider.knutsel.space:.`
+Since the `authorized_keys` file alreayd holds the `/var/www/htdocs/egbertpot.nl` path, you should not specify the full path again. That is why the destination should look like `deploy@your-vm-host.com:.`
 
 e.g.
 
 ```shell
-rsync -avzn --delete -e "ssh -i id_ed25519_deploy" output/ deploy@spider.knutsel.space:.
+rsync -avzn --delete -e "ssh -i id_ed25519_deploy" output/ deploy@your-vm-host.com:.
 ```
 
 drop -n once that looks right
 
 ```
-rsync -avz --delete -e "ssh -i id_ed25519_deploy" output/ deploy@spider.knutsel.space:.
+rsync -avz --delete -e "ssh -i id_ed25519_deploy" output/ deploy@your-vm-host.com:.
 ```
 
 
